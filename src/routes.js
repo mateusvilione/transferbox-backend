@@ -1,9 +1,7 @@
 const express = require('express');
+const routes = express.Router();
 const multer = require('multer');
 const multerConfig = require('./config/multer');
-
-const routes = express.Router();
-
 const BoxController = require('./controllers/BoxController');
 const FileController = require('./controllers/Filecontroller');
 

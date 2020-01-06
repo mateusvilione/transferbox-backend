@@ -1,14 +1,15 @@
+const dotenv = require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
+const mongoose = require('./config/mongoConnection');
+const routes = require('./routes');
 const path = require("path");
+const port = process.env.PORT;
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
 const cors = require("cors");
 
 const app = express();
-
 app.use(cors());
-
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
 
 io.on('connection', socket => {
     socket.on('conectRoom', box => {
@@ -16,21 +17,16 @@ io.on('connection', socket => {
     })
 })
 
-mongoose.connect("mongodb+srv://transferbox:transferbox123@cluster0-gc1ml.mongodb.net/transferbox?retryWrites=true", 
-{
-    useNewUrlParser: true
-});
-
 app.use((req, res, next) => {
     req.io = io;
-
     return next();
 });
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use(routes);
 app.use("/files", express.static(path.resolve(__dirname, '..', 'tmp')));
 
-app.use(require('./routes'));
-
-server.listen(process.env.PORT || 3333);
+server.listen(port, () => {
+    console.log("* Servidor iniciado na porta " + port + ".");
+});
